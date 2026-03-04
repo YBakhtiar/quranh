@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest" href="manifest.json">
+    
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0d1622">
+    <link rel="apple-touch-icon" href="./icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="القرآن">
+
     <title>القرآن الكريم</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vazirmatn/33.0.0/Vazirmatn-font-face.min.css">
@@ -45,7 +52,6 @@
             transform: scale(1.05);
         }
 
-        /* دکمه دانلود آفلاین خارج از منو (بالا چپ) */
         .main-download-btn {
             position: fixed;
             top: 20px;
@@ -337,36 +343,33 @@
         let currentPage = 1;
         let isDownloaded = false; 
 
+        // ثبت Service Worker با مسیر نسبی صحیح
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
+                navigator.serviceWorker.register('./sw.js')
                     .then(reg => console.log('Service Worker ثبت شد', reg))
                     .catch(err => console.log('خطا در ثبت Service Worker', err));
             });
         }
 
-        // --- توابع مربوط به آفلاین و دانلود --- //
-
-        // تغییرات اعمال شده: این تابع دکمه دانلود را کاملا مخفی میکند
         function setDownloadedUI() {
             const dlBtn = document.getElementById('mainDownloadBtn');
-            dlBtn.style.display = "none"; // مخفی کردن کامل دکمه
+            dlBtn.style.display = "none";
             document.getElementById('progressTooltip').style.display = "none";
             
             const delBtn = document.getElementById('deleteBtnSidebar');
-            if(delBtn) delBtn.style.display = "block"; // نمایش دکمه حذف در انتهای لیست
+            if(delBtn) delBtn.style.display = "block";
             isDownloaded = true;
         }
 
-        // تغییرات اعمال شده: وقتی کش پاک شد، دکمه دانلود دوباره ظاهر میشود
         function resetDownloadedUI() {
             const dlBtn = document.getElementById('mainDownloadBtn');
-            dlBtn.style.display = "block"; // برگرداندن دکمه
+            dlBtn.style.display = "block";
             dlBtn.innerHTML = "📥 دانلود آفلاین";
             dlBtn.style.pointerEvents = "auto";
             
             const delBtn = document.getElementById('deleteBtnSidebar');
-            if(delBtn) delBtn.style.display = "none"; // پنهان کردن دکمه حذف
+            if(delBtn) delBtn.style.display = "none";
             isDownloaded = false;
         }
 
@@ -389,7 +392,7 @@
                         const promises = [];
                         for (let j = 0; j < batchSize && (i + j) <= totalPages; j++) {
                             let pageNum = formatPageNumber(i + j);
-                            let imgUrl = `Quran${pageNum}.jpg`;
+                            let imgUrl = `./Quran${pageNum}.jpg`; // اضافه شدن نقطه برای آدرس دهی صحیح
                             
                             promises.push(
                                 fetch(imgUrl).then(response => {
@@ -490,11 +493,12 @@
                 rightPageNum -= 1;
             }
 
-            document.getElementById("rightPage").src = "Quran" + formatPageNumber(rightPageNum) + ".jpg";
+            // مسیر تصاویر با استفاده از نقطه و اسلش
+            document.getElementById("rightPage").src = "./Quran" + formatPageNumber(rightPageNum) + ".jpg";
             
             let leftPageNum = rightPageNum + 1;
             if (leftPageNum <= totalPages) {
-                document.getElementById("leftPage").src = "Quran" + formatPageNumber(leftPageNum) + ".jpg";
+                document.getElementById("leftPage").src = "./Quran" + formatPageNumber(leftPageNum) + ".jpg";
                 document.getElementById("leftPage").style.display = "block";
             } else {
                 document.getElementById("leftPage").style.display = "none";
@@ -540,7 +544,7 @@
             updatePages();
             
             caches.open('quran-cache-v1').then(cache => {
-                cache.match('Quran001.jpg').then(response => {
+                cache.match('./Quran001.jpg').then(response => {
                     if (response) {
                         setDownloadedUI();
                     }
